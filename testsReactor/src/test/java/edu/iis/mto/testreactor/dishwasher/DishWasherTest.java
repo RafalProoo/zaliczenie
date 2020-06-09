@@ -18,6 +18,11 @@ public class DishWasherTest {
     private Door door;
 
     DishWasher dishWasher;
+    private final ProgramConfiguration exampleProperProgramConfiguration = ProgramConfiguration.builder()
+                                                                                               .withProgram(WashingProgram.ECO)
+                                                                                               .withFillLevel(FillLevel.HALF)
+                                                                                               .withTabletsUsed(true)
+                                                                                               .build();
 
     @Before
     public void init() {
@@ -36,26 +41,16 @@ public class DishWasherTest {
 
     @Test
     public void openDoorShouldResultInDoorOpenStatus() {
-        ProgramConfiguration exampleProperProgramConfiguration = ProgramConfiguration.builder()
-                                                                                     .withProgram(WashingProgram.ECO)
-                                                                                     .withFillLevel(FillLevel.HALF)
-                                                                                     .withTabletsUsed(true)
-                                                                                     .build();
         Mockito.when(door.closed()).thenReturn(false);
 
         RunResult runResult = dishWasher.start(exampleProperProgramConfiguration);
         Status expectedStatus = Status.DOOR_OPEN;
 
-        Assert.assertEquals(runResult.getStatus(), expectedStatus);
+        Assert.assertEquals(expectedStatus, runResult.getStatus());
     }
 
     @Test
     public void fullFilterShouldResultInErrorFilterStatus() {
-        ProgramConfiguration exampleProperProgramConfiguration = ProgramConfiguration.builder()
-                                                                                     .withProgram(WashingProgram.ECO)
-                                                                                     .withFillLevel(FillLevel.HALF)
-                                                                                     .withTabletsUsed(true)
-                                                                                     .build();
         Mockito.when(door.closed()).thenReturn(true);
         Mockito.when(dirtFilter.capacity()).thenReturn(49.9);
 
