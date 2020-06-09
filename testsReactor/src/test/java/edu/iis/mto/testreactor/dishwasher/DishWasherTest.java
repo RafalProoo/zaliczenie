@@ -45,7 +45,24 @@ public class DishWasherTest {
 
         RunResult runResult = dishWasher.start(exampleProperProgramConfiguration);
         Status expectedStatus = Status.DOOR_OPEN;
-        
+
         Assert.assertEquals(runResult.getStatus(), expectedStatus);
+    }
+
+    @Test
+    public void fullFilterShouldResultInErrorFilterStatus() {
+        ProgramConfiguration exampleProperProgramConfiguration = ProgramConfiguration.builder()
+                                                                                     .withProgram(WashingProgram.ECO)
+                                                                                     .withFillLevel(FillLevel.HALF)
+                                                                                     .withTabletsUsed(true)
+                                                                                     .build();
+        Mockito.when(door.closed()).thenReturn(true);
+        Mockito.when(dirtFilter.capacity()).thenReturn(49.9);
+
+        RunResult runResult = dishWasher.start(exampleProperProgramConfiguration);
+
+        Status expectedStatus = Status.ERROR_FILTER;
+
+        Assert.assertEquals(expectedStatus, runResult.getStatus());
     }
 }
