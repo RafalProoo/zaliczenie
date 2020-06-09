@@ -1,11 +1,14 @@
 package edu.iis.mto.testreactor.dishwasher;
 
 import edu.iis.mto.testreactor.dishwasher.engine.Engine;
+import edu.iis.mto.testreactor.dishwasher.engine.EngineException;
+import edu.iis.mto.testreactor.dishwasher.pump.PumpException;
 import edu.iis.mto.testreactor.dishwasher.pump.WaterPump;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.InOrder;
 import org.mockito.Mockito;
 
 import static org.junit.Assert.assertThat;
@@ -59,5 +62,22 @@ public class DishWasherTest {
         Status expectedStatus = Status.ERROR_FILTER;
 
         Assert.assertEquals(expectedStatus, runResult.getStatus());
+    }
+
+    @Test
+    public void methodsShouldBeCalledInRightOrder() throws PumpException, EngineException {
+        Mockito.when(door.closed()).thenReturn(true);
+        Mockito.when(dirtFilter.capacity()).thenReturn(60.5);
+
+        InOrder inOrder = Mockito.inOrder(door, waterPump, engine);
+
+        dishWasher.start(exampleProperProgramConfiguration);
+
+        inOrder.verify(door).closed();
+        inOrder.verify(waterPump).pour(Mockito.any(FillLevel.class));
+        inOrder.verify(engine).runProgram(Mockito.any(WashingProgram.class));
+        inOrder.verify(waterPump).drain();
+        inOrder.verify(door).unlock();
+
     }
 }
