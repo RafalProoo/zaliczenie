@@ -7,6 +7,7 @@ import edu.iis.mto.testreactor.dishwasher.pump.WaterPump;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.InOrder;
 import org.mockito.Mockito;
@@ -78,6 +79,28 @@ public class DishWasherTest {
         inOrder.verify(engine).runProgram(Mockito.any(WashingProgram.class));
         inOrder.verify(waterPump).drain();
         inOrder.verify(door).unlock();
+    }
 
+    @Test
+    public void successfulWashingShouldResultInSuccessStatus() {
+        Mockito.when(door.closed()).thenReturn(true);
+        Mockito.when(dirtFilter.capacity()).thenReturn(60.5);
+
+        RunResult runResult = dishWasher.start(exampleProperProgramConfiguration);
+
+        Status expectedStatus = Status.SUCCESS;
+
+        Assert.assertEquals(expectedStatus, runResult.getStatus());
+    }
+
+    @Ignore
+    public void successfulWashingShouldRunProgramOnlyOnce() throws  PumpException {
+        Mockito.when(door.closed()).thenReturn(true);
+        Mockito.when(dirtFilter.capacity()).thenReturn(60.5);
+
+        dishWasher.start(exampleProperProgramConfiguration);
+
+        Mockito.verify(waterPump, Mockito.times(1))
+               .pour(Mockito.any(FillLevel.class));
     }
 }
