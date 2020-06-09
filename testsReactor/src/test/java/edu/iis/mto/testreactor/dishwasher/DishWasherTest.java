@@ -5,7 +5,6 @@ import edu.iis.mto.testreactor.dishwasher.engine.EngineException;
 import edu.iis.mto.testreactor.dishwasher.pump.PumpException;
 import edu.iis.mto.testreactor.dishwasher.pump.WaterPump;
 import org.hamcrest.Matchers;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -13,6 +12,7 @@ import org.mockito.InOrder;
 import org.mockito.Mockito;
 
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertEquals;
 
 public class DishWasherTest {
 
@@ -50,7 +50,7 @@ public class DishWasherTest {
         RunResult runResult = dishWasher.start(exampleProperProgramConfiguration);
         Status expectedStatus = Status.DOOR_OPEN;
 
-        Assert.assertEquals(expectedStatus, runResult.getStatus());
+        assertEquals(expectedStatus, runResult.getStatus());
     }
 
     @Test
@@ -62,7 +62,7 @@ public class DishWasherTest {
 
         Status expectedStatus = Status.ERROR_FILTER;
 
-        Assert.assertEquals(expectedStatus, runResult.getStatus());
+        assertEquals(expectedStatus, runResult.getStatus());
     }
 
     @Test
@@ -90,7 +90,7 @@ public class DishWasherTest {
 
         Status expectedStatus = Status.SUCCESS;
 
-        Assert.assertEquals(expectedStatus, runResult.getStatus());
+        assertEquals(expectedStatus, runResult.getStatus());
     }
 
     @Ignore
@@ -102,5 +102,17 @@ public class DishWasherTest {
 
         Mockito.verify(waterPump, Mockito.times(1))
                .pour(Mockito.any(FillLevel.class));
+    }
+
+    @Test
+    public void shouldReturnProperMinutes(){
+        Mockito.when(door.closed()).thenReturn(true);
+        Mockito.when(dirtFilter.capacity()).thenReturn(60.5);
+
+        RunResult runResult = dishWasher.start(exampleProperProgramConfiguration);
+
+        int expectedMinutes = 90;
+
+        assertEquals(expectedMinutes, runResult.getRunMinutes());
     }
 }
